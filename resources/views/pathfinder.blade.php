@@ -621,16 +621,11 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="laravel-badge">Laravel 11</div>
             <h1>
                 <i class="fas fa-route"></i>
                 {{ config('app.name') }}
-                <span class="algorithm-badge">
-                    <i class="fas fa-brain"></i>
-                    A* + Road Weighting
-                </span>
             </h1>
-            <p>Temukan rute terpendek dengan sistem pembobotan jalan menggunakan algoritma A*</p>
+            <p>Jalur Evakuasi Banjir Wisata Kota Lama Semarang</p>
         </div>
 
         <div class="main-content">
