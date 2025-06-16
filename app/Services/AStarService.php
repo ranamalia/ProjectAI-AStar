@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 
 class AStarService
 {
-    public function findPath($startNodeId, $endNodeId)
+    public function findPath(int $startNodeId, int $endNodeId): array
     {
         $startNode = Node::find($startNodeId);
         $endNode = Node::find($endNodeId);
@@ -39,7 +39,6 @@ class AStarService
                 return $nodeId == $current;
             });
 
-            $currentNode = Node::find($current);
             $neighbors = Edge::where('from_node_id', $current)->get();
 
             foreach ($neighbors as $edge) {
@@ -67,7 +66,7 @@ class AStarService
         ];
     }
 
-    private function reconstructPath($cameFrom, $current, $startNode, $endNode)
+    private function reconstructPath(array $cameFrom, int $current, Node $startNode, Node $endNode): array
     {
         $path = [$current];
         $pathNodes = [Node::find($current)];

@@ -6,24 +6,23 @@ use App\Models\Node;
 use App\Models\Edge;
 use App\Services\AStarService;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
 
 class PathfinderController extends Controller
 {
-    protected $astarService;
+    public function __construct(
+        protected AStarService $astarService
+    ) {}
 
-    public function __construct(AStarService $astarService)
-    {
-        $this->astarService = $astarService;
-    }
-
-    public function index()
+    public function index(): View
     {
         return view('pathfinder');
     }
 
-    public function loadData(Request $request)
+    public function loadData(Request $request): JsonResponse
     {
         try {
             Log::info('Loading data started');
@@ -68,15 +67,15 @@ class PathfinderController extends Controller
         }
     }
 
-    public function findPath(Request $request)
+    public function findPath(Request $request): JsonResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'start' => 'required|string',
             'end' => 'required|string'
         ]);
 
-        $startNode = Node::where('name', $request->start)->first();
-        $endNode = Node::where('name', $request->end)->first();
+        $startNode = Node::where('name', $validated['start'])->first();
+        $endNode = Node::where('name', $validated['end'])->first();
 
         if (!$startNode || !$endNode) {
             return response()->json([
@@ -96,18 +95,18 @@ class PathfinderController extends Controller
         return response()->json($result);
     }
 
-    public function getNodes()
+    public function getNodes(): JsonResponse
     {
         $nodes = Node::orderBy('name')->pluck('name');
         return response()->json($nodes);
     }
 
-    public function getRoadTypes()
+    public function getRoadTypes(): JsonResponse
     {
         return response()->json(Edge::ROAD_TYPES);
     }
 
-    private function loadSemarangData()
+    private function loadSemarangData(): void
     {
         // Sample data with road types and weights
         $nodesData = [

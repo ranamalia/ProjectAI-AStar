@@ -2,13 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Edge extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'from_node_id',
         'to_node_id',
@@ -17,10 +15,13 @@ class Edge extends Model
         'weight'
     ];
 
-    protected $casts = [
-        'distance' => 'float',
-        'weight' => 'float'
-    ];
+    protected function casts(): array
+    {
+        return [
+            'distance' => 'float',
+            'weight' => 'float'
+        ];
+    }
 
     // Road type constants with their weights
     const ROAD_TYPES = [
@@ -30,22 +31,22 @@ class Edge extends Model
         'residential' => ['name' => 'Gang/Perumahan', 'weight' => 1.5],
     ];
 
-    public function fromNode()
+    public function fromNode(): BelongsTo
     {
         return $this->belongsTo(Node::class, 'from_node_id');
     }
 
-    public function toNode()
+    public function toNode(): BelongsTo
     {
         return $this->belongsTo(Node::class, 'to_node_id');
     }
 
-    public function getWeightedDistance()
+    public function getWeightedDistance(): float
     {
         return $this->distance * $this->weight;
     }
 
-    public function getRoadTypeName()
+    public function getRoadTypeName(): string
     {
         return self::ROAD_TYPES[$this->road_type]['name'] ?? 'Unknown';
     }

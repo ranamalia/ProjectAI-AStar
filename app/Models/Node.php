@@ -2,41 +2,43 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Node extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'name',
         'latitude',
         'longitude'
     ];
 
-    protected $casts = [
-        'latitude' => 'float',
-        'longitude' => 'float'
-    ];
+    protected function casts(): array
+    {
+        return [
+            'latitude' => 'float',
+            'longitude' => 'float'
+        ];
+    }
 
-    public function edges()
+    public function edges(): HasMany
     {
         return $this->hasMany(Edge::class, 'from_node_id');
     }
 
-    public function incomingEdges()
+    public function incomingEdges(): HasMany
     {
         return $this->hasMany(Edge::class, 'to_node_id');
     }
 
-    public function neighbors()
+    public function neighbors(): BelongsToMany
     {
         return $this->belongsToMany(Node::class, 'edges', 'from_node_id', 'to_node_id')
                     ->withPivot(['distance', 'road_type', 'weight']);
     }
 
-    public function calculateDistance(Node $other)
+    public function calculateDistance(Node $other): float
     {
         $lat1 = deg2rad($this->latitude);
         $lon1 = deg2rad($this->longitude);
