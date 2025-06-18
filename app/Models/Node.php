@@ -38,6 +38,7 @@ class Node extends Model
                     ->withPivot(['distance', 'road_type', 'weight']);
     }
 
+    //Menggunakan rumus Haversine untuk menghitung jarak antar dua node berdasarkan koordinat GPS
     public function calculateDistance(Node $other): float
     {
         $lat1 = deg2rad($this->latitude);

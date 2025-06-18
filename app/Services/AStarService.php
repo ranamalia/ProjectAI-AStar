@@ -9,7 +9,9 @@ use Illuminate\Support\Collection;
 class AStarService
 {
     public function findPath(int $startNodeId, int $endNodeId): array
+    //Mencari rute terbaik dari node awal ke node tujuan dengan algoritma A*
     {
+        //mengambil node awal dan akhir, mengambil dari databasenya
         $startNode = Node::find($startNodeId);
         $endNode = Node::find($endNodeId);
 
@@ -24,23 +26,32 @@ class AStarService
         $cameFrom = [];
         $gScore = [$startNodeId => 0];
         $fScore = [$startNodeId => $startNode->calculateDistance($endNode)];
+        //openset = Kumpulan node yang dikunjungi
+        //camefrom = Untuk menyimpan dari mana sebuah node dikunjungi
+        //gScore: jarak terpendek dari awal ke node tertentu
+        //fScore: estimasi total biaya dari awal ke tujuan melalui node tersebut
 
         while ($openSet->isNotEmpty()) {
-            // Find node with lowest fScore
+            // Menentukan Node dengan fScore Terkecil
             $current = $openSet->sortBy(function($nodeId) use ($fScore) {
-                return $fScore[$nodeId] ?? INF;
+                return $fScore[$nodeId] ?? INF; //Kalau fScore tidak ada (belum dihitung), dianggap INF (tak hingga)
             })->first();
+            //prioritaskan node yang kemungkinan besar paling cepat sampai tujuan.
 
+            //Cek Apakah Sudah Sampai Tujuan
             if ($current == $endNodeId) {
                 return $this->reconstructPath($cameFrom, $current, $startNode, $endNode);
             }
+            //Kalau current adalah node tujuan, berarti jalur sudah ketemu. Panggil reconstructPath untuk menyusun rute dari awal ke tujuan, lalu kembalikan hasilnya.
 
             $openSet = $openSet->reject(function($nodeId) use ($current) {
                 return $nodeId == $current;
             });
 
+            ////Ambil Semua Tetangga (Neighbor)
             $neighbors = Edge::where('from_node_id', $current)->get();
 
+            //Loop ke Setiap Tetangga
             foreach ($neighbors as $edge) {
                 $neighborId = $edge->to_node_id;
                 $tentativeGScore = ($gScore[$current] ?? INF) + $edge->getWeightedDistance();
@@ -77,7 +88,7 @@ class AStarService
             array_unshift($pathNodes, Node::find($current));
         }
 
-        // Calculate segments with road type information
+        // Hitung Segmentasi Jalur & Detail Jalan
         $segments = [];
         $totalDistance = 0;
         $totalWeightedDistance = 0;

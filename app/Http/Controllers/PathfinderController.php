@@ -67,6 +67,7 @@ class PathfinderController extends Controller
         }
     }
 
+    // Mencari rute terpendek (evakuasi) antara dua node berdasarkan input user.
     public function findPath(Request $request): JsonResponse
     {
         $validated = $request->validate([
